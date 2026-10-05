@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#f6f5ef">
+	<title>Gather & Graze | Find your next favorite</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			color-scheme: light;
+			--paper: #f5ecdd;
+			--ink: #35281e;
+			--muted: #807366;
+			--green: #c65c2f;
+			--green-dark: #87411f;
+			--lime: #f3c94f;
+			--line: #e4d5c0;
+			--white: #fffdf9;
+			--hero-muted: #f1ddc3;
+			--search-icon: #887b6a;
+			--placeholder: #978a79;
+			--button-text: #49311e;
+			--chip-text: #665644;
+			--image-placeholder: #e9dcc8;
+			--card-surface: rgba(255, 253, 249, .95);
+			--heart: #bf5142;
+			--meta-separator: #b7a68e;
+			--scrim: rgba(42, 28, 17, .68);
+			--instructions: #63584b;
+			--serif: "Playfair Display", Georgia, serif;
+			--sans: "DM Sans", "Segoe UI", sans-serif;
+		}
+		:root[data-theme="dark"] {
+			color-scheme: dark;
+			--paper: #211b16;
+			--ink: #f4e8d5;
+			--muted: #b8a894;
+			--green: #f08a4b;
+			--green-dark: #38271c;
+			--lime: #f3c94f;
+			--line: #4d3d30;
+			--white: #30261e;
+			--hero-muted: #e7d3b9;
+			--search-icon: #c8b69e;
+			--placeholder: #b6a48d;
+			--button-text: #3a2819;
+			--chip-text: #e6d8c5;
+			--image-placeholder: #3c3025;
+			--card-surface: rgba(48, 38, 30, .96);
+			--heart: #ff9177;
+			--meta-separator: #887661;
+			--scrim: rgba(10, 8, 6, .78);
+			--instructions: #ddcfbc;
+		}
+
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			background: var(--paper);
+			color: var(--ink);
+			font-family: var(--sans);
+			-webkit-font-smoothing: antialiased;
+		}
+		button, input, select { font: inherit; }
+		button { cursor: pointer; }
+		.page-shell { width: min(1320px, calc(100% - 64px)); margin: 0 auto; }
+		.topbar {
+			height: 78px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			border-bottom: 1px solid var(--line);
+		}
+		.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+		.brand-mark {
+			width: 34px; height: 34px; display: grid; place-items: center;
+			border-radius: 50%; background: var(--green); color: var(--lime); font-size: 19px;
+		}
+		.brand-name { font-size: 16px; font-weight: 700; letter-spacing: 0; }
+		.brand-name span { color: var(--green); }
+		.top-note { color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+		.top-actions { display: flex; align-items: center; gap: 20px; }
+		.theme-toggle {
+			display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line);
+			border-radius: 3px; padding: 8px 10px; background: var(--white); color: var(--ink);
+			font-size: 11px; font-weight: 600; transition: border-color .2s ease, background .2s ease;
+		}
+		.theme-toggle:hover { border-color: var(--green); }
+		.theme-toggle svg { width: 15px; height: 15px; }
+		.theme-sun, :root[data-theme="dark"] .theme-moon { display: none; }
+		:root[data-theme="dark"] .theme-sun { display: block; }
+
+		.hero {
+			min-height: 360px;
+			margin-top: 26px;
+			padding: 54px 6.4%;
+			position: relative;
+			overflow: hidden;
+			display: flex;
+			align-items: center;
+			border-radius: 5px;
+			background: var(--green-dark);
+			color: white;
+		}
+		.hero::before, .hero::after { content: ""; position: absolute; pointer-events: none; }
+		.hero::before {
+			width: 370px; height: 370px; right: 10%; top: -205px;
+			border: 1px solid rgba(243, 201, 79, .25); border-radius: 50%;
+			box-shadow: 0 0 0 28px rgba(243, 201, 79, .035), 0 0 0 58px rgba(243, 201, 79, .035);
+		}
+		.hero::after {
+			width: 200px; height: 200px; right: 8%; bottom: -128px;
+			border: 1px solid rgba(243, 201, 79, .3); border-radius: 50%;
+		}
+		.hero-copy { position: relative; z-index: 1; max-width: 600px; }
+		.eyebrow { margin: 0 0 16px; color: var(--lime); font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+		h1, h2, h3, p { margin-top: 0; }
+		h1 { max-width: 570px; margin-bottom: 14px; font: 600 52px/1.08 var(--serif); letter-spacing: 0; }
+		.hero-copy > p:last-child { margin: 0; color: var(--hero-muted); font-size: 15px; line-height: 1.7; }
+		.search-area { position: relative; z-index: 1; width: min(570px, 100%); margin-top: 28px; }
+		.search-form {
+			display: flex; align-items: center; gap: 8px; padding: 6px;
+			background: var(--white); border-radius: 4px;
+		}
+		.search-icon { width: 20px; height: 20px; margin-left: 12px; color: var(--search-icon); flex: 0 0 auto; }
+		.search-form input { min-width: 0; flex: 1; border: 0; outline: 0; padding: 11px 4px; color: var(--ink); background: transparent; font-size: 14px; }
+		.search-form input::placeholder { color: var(--placeholder); }
+		.search-button {
+			border: 0; border-radius: 3px; padding: 12px 19px; background: var(--lime);
+			color: var(--button-text); font-size: 13px; font-weight: 700; transition: background .2s ease;
+		}
+		.search-button:hover { background: #f8d970; }
+
+		main { padding: 46px 0 78px; }
+		.section-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 22px; }
+		.section-heading .eyebrow { margin-bottom: 7px; color: var(--green); }
+		h2 { margin: 0; font: 600 30px/1.15 var(--serif); letter-spacing: 0; }
+		.result-count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+		.toolbar {
+			min-height: 53px; display: flex; align-items: center; justify-content: space-between;
+			gap: 18px; padding: 10px 0 14px; border-top: 1px solid var(--line);
+		}
+		.filter-list { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+		.filter-label { margin-right: 4px; color: var(--muted); font-size: 12px; }
+		.filter-chip {
+			border: 1px solid var(--line); border-radius: 3px; padding: 7px 11px;
+			background: transparent; color: var(--chip-text); font-size: 11px; transition: .18s ease;
+		}
+		.filter-chip:hover, .filter-chip.active { border-color: var(--green); background: var(--green); color: white; }
+		.filter-controls { display: flex; align-items: center; gap: 10px; }
+		.filter-controls select, .ingredient-filter {
+			max-width: 170px; height: 34px; border: 1px solid var(--line); border-radius: 3px;
+			padding: 0 10px; background: transparent; color: var(--ink); font-size: 11px;
+		}
+		.ingredient-filter { width: 150px; }
+		.saved-toggle {
+			height: 34px; display: inline-flex; align-items: center; gap: 7px; border: 0;
+			padding: 0 3px; background: transparent; color: var(--green); font-size: 11px; font-weight: 700;
+		}
+		.saved-toggle svg { width: 15px; height: 15px; }
+
+		.recipe-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 27px 18px; }
+		.recipe-card { min-width: 0; animation: appear .4s ease both; }
+		.recipe-image-wrap { position: relative; aspect-ratio: 1.18 / 1; overflow: hidden; background: var(--image-placeholder); }
+		.recipe-image-link { display: block; width: 100%; height: 100%; }
+		.recipe-image { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+		.recipe-card:hover .recipe-image { transform: scale(1.045); }
+		.video-preview {
+			position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%;
+			border: 0; opacity: 0; pointer-events: none; transition: opacity .2s ease;
+		}
+		.recipe-image-wrap.is-previewing .video-preview { opacity: 1; }
+		.card-category {
+			position: absolute; z-index: 2; bottom: 11px; left: 11px; padding: 6px 9px;
+			background: var(--card-surface); color: var(--green-dark); font-size: 9px;
+			font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+		}
+		.favorite-button {
+			position: absolute; z-index: 2; top: 10px; right: 10px; width: 34px; height: 34px;
+			display: grid; place-items: center; border: 0; border-radius: 50%;
+			background: var(--card-surface); color: var(--muted);
+		}
+		.favorite-button:hover, .favorite-button.is-favorite { color: var(--heart); }
+		.favorite-button svg { width: 17px; height: 17px; }
+		.recipe-info { padding: 13px 1px 0; }
+		.recipe-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; color: var(--muted); font-size: 10px; }
+		.recipe-meta span + span::before { content: "·"; margin-right: 8px; color: var(--meta-separator); }
+		.recipe-title { margin: 0; font: 600 18px/1.25 var(--serif); letter-spacing: 0; }
+		.recipe-title a, .recipe-title button { border: 0; padding: 0; background: transparent; color: inherit; text-align: left; text-decoration: none; font: inherit; }
+		.recipe-title a:hover, .recipe-title button:hover { color: var(--green); }
+		.recipe-origin { margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+		.status-message { grid-column: 1 / -1; min-height: 180px; display: grid; place-content: center; text-align: center; color: var(--muted); }
+		.status-message strong { margin-bottom: 7px; color: var(--ink); font: 600 23px var(--serif); }
+		.status-message p { margin-bottom: 0; font-size: 13px; }
+		.loading-dot { width: 9px; height: 9px; margin: 0 auto 12px; border-radius: 50%; background: var(--green); animation: pulse .9s infinite alternate; }
+		.load-more-wrap { display: flex; justify-content: center; padding-top: 34px; }
+		.load-more {
+			border: 1px solid var(--green); border-radius: 3px; padding: 12px 20px;
+			background: transparent; color: var(--green); font-size: 12px; font-weight: 700;
+		}
+		.load-more:hover { background: var(--green); color: white; }
+		.load-more[hidden] { display: none; }
+		footer { border-top: 1px solid var(--line); padding: 22px 0 28px; color: var(--muted); font-size: 11px; }
+		footer .page-shell { display: flex; justify-content: space-between; gap: 16px; }
+
+		.modal-backdrop { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 22px; background: var(--scrim); }
+		.modal-backdrop[hidden] { display: none; }
+		.recipe-modal {
+			position: relative; width: min(800px, 100%); max-height: min(88vh, 850px); overflow: auto;
+			background: var(--paper); border-radius: 4px; animation: appear .2s ease both;
+		}
+		.modal-close { position: absolute; z-index: 1; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--white); color: var(--ink); font-size: 22px; }
+		.modal-image { display: block; width: 100%; max-height: 330px; object-fit: cover; }
+		.modal-content { padding: 28px clamp(22px, 5vw, 48px) 38px; }
+		.modal-content h2 { margin-bottom: 9px; }
+		.modal-subtitle { color: var(--muted); font-size: 12px; }
+		.modal-columns { display: grid; grid-template-columns: minmax(180px, .8fr) 1.5fr; gap: 34px; margin-top: 26px; }
+		.modal-columns h3 { margin: 0 0 12px; color: var(--green); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+		.ingredient-list { margin: 0; padding: 0; list-style: none; }
+		.ingredient-list li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+		.ingredient-list li span:last-child { color: var(--muted); text-align: right; }
+		.instructions { color: var(--instructions); font-size: 13px; line-height: 1.8; white-space: pre-line; }
+		@keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+		@keyframes pulse { to { opacity: .25; transform: scale(.8); } }
+
+		@media (max-width: 1000px) {
+			.recipe-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+			.toolbar { align-items: flex-start; flex-direction: column; }
+			.filter-controls { width: 100%; flex-wrap: wrap; }
+		}
+		@media (max-width: 680px) {
+			.page-shell { width: min(100% - 36px, 520px); }
+			.topbar { height: 66px; }
+			.top-note { display: none; }
+			.top-actions { gap: 0; }
+			.hero { min-height: 390px; margin-top: 18px; padding: 38px 25px; }
+			h1 { font-size: 42px; }
+			.hero::before { right: -180px; }
+			.hero::after { right: -50px; }
+			main { padding-top: 36px; }
+			.section-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
+			h2 { font-size: 27px; }
+			.recipe-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+			.recipe-image-wrap { aspect-ratio: .95 / 1; }
+			.recipe-title { font-size: 16px; }
+			.filter-controls select { flex: 1; max-width: none; }
+			.ingredient-filter { flex: 1; max-width: none; }
+			.modal-columns { grid-template-columns: 1fr; gap: 24px; }
+			footer .page-shell { flex-direction: column; }
+		}
+		@media (max-width: 380px) {
+			.page-shell { width: calc(100% - 28px); }
+			h1 { font-size: 36px; }
+			.recipe-grid { gap: 20px 10px; }
+			.recipe-meta { gap: 5px; font-size: 9px; }
+			.recipe-meta span + span::before { margin-right: 5px; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+		}
+	</style>
+</head>
+<body>
+	<div class="page-shell">
+		<header class="topbar">
+			<a class="brand" href="#top" aria-label="Gather and Graze home">
+				<span class="brand-mark" aria-hidden="true">✳</span>
+				<span class="brand-name">gather <span>&</span> graze</span>
+			</a>
+			<div class="top-actions">
+				<span class="top-note">GOOD FOOD, FOUND.</span>
+				<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+					<svg class="theme-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.2 15.2A8.6 8.6 0 0 1 8.8 3.8 8.7 8.7 0 1 0 20.2 15.2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					<svg class="theme-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+					<span id="theme-label">Dark mode</span>
+				</button>
+			</div>
+		</header>
+
+		<section class="hero" id="top" aria-labelledby="hero-title">
+			<div class="hero-copy">
+				<p class="eyebrow">A little inspiration for tonight</p>
+				<h1 id="hero-title">Find something wonderful to make.</h1>
+				<p>Recipes worth slowing down for, gathered from kitchens around the world.</p>
+				<div class="search-area">
+					<form class="search-form" id="search-form" role="search">
+						<svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4.4 4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+						<input id="search-input" type="search" placeholder="Try “pasta”, “salmon”, “comfort food”…" aria-label="Search recipes">
+						<button class="search-button" type="submit">Find recipes</button>
+					</form>
+				</div>
+			</div>
+		</section>
+
+		<main>
+			<div class="section-heading">
+				<div>
+					<p class="eyebrow">The recipe journal</p>
+					<h2 id="collection-title">A few good things</h2>
+				</div>
+				<span class="result-count" id="result-count" aria-live="polite"></span>
+			</div>
+			<section class="toolbar" aria-label="Recipe filters">
+				<div class="filter-list" id="category-filters" aria-label="Filter by category">
+					<span class="filter-label">Browse:</span>
+					<button class="filter-chip active" type="button" data-category="all">Everything</button>
+				</div>
+				<div class="filter-controls">
+					<select id="area-filter" aria-label="Filter by cuisine"><option value="all">All cuisines</option></select>
+					<input class="ingredient-filter" id="ingredient-filter" type="search" placeholder="Ingredient…" aria-label="Filter by ingredient">
+					<select id="sort-filter" aria-label="Sort recipes">
+						<option value="featured">Sort: Featured</option>
+						<option value="az">Name: A to Z</option>
+						<option value="za">Name: Z to A</option>
+					</select>
+					<button class="saved-toggle" id="saved-toggle" type="button" aria-pressed="false">
+						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.4 8.8c0 4.4-8.4 10-8.4 10s-8.4-5.6-8.4-10a4.6 4.6 0 0 1 8.4-2.6 4.6 4.6 0 0 1 8.4 2.6Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+						Saved <span id="saved-count">0</span>
+					</button>
+				</div>
+			</section>
+			<section class="recipe-grid" id="recipe-grid" aria-live="polite" aria-label="Recipes"></section>
+			<div class="load-more-wrap"><button class="load-more" id="load-more" type="button" hidden>Show more recipes</button></div>
+		</main>
+	</div>
+	<footer><div class="page-shell"><span>Made for curious appetites.</span><span>Recipes from TheMealDB</span></div></footer>
+
+	<div class="modal-backdrop" id="recipe-modal" hidden>
+		<article class="recipe-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+			<button class="modal-close" id="modal-close" type="button" aria-label="Close recipe">×</button>
+			<img class="modal-image" id="modal-image" alt="">
+			<div class="modal-content">
+				<p class="eyebrow" id="modal-category"></p>
+				<h2 id="modal-title"></h2>
+				<p class="modal-subtitle" id="modal-subtitle"></p>
+				<div class="modal-columns">
+					<section><h3>What you'll need</h3><ul class="ingredient-list" id="modal-ingredients"></ul></section>
+					<section><h3>Let's make it</h3><div class="instructions" id="modal-instructions"></div></section>
+				</div>
+			</div>
+		</article>
+	</div>
+
+	<script>
+		const API = "https://www.themealdb.com/api/json/v1/1";
+		const grid = document.querySelector("#recipe-grid");
+		const categoryFilters = document.querySelector("#category-filters");
+		const areaFilter = document.querySelector("#area-filter");
+		const ingredientFilter = document.querySelector("#ingredient-filter");
+		const sortFilter = document.querySelector("#sort-filter");
+		const searchInput = document.querySelector("#search-input");
+		const loadMoreButton = document.querySelector("#load-more");
+		const savedToggle = document.querySelector("#saved-toggle");
+		const themeToggle = document.querySelector("#theme-toggle");
+		const modal = document.querySelector("#recipe-modal");
+
+		function applyTheme(theme) {
+			const isDark = theme === "dark";
+			document.documentElement.dataset.theme = isDark ? "dark" : "light";
+			themeToggle.setAttribute("aria-pressed", String(isDark));
+			themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+			document.querySelector("#theme-label").textContent = `${isDark ? "Light" : "Dark"} mode`;
+			document.querySelector('meta[name="theme-color"]').content = isDark ? "#211b16" : "#f5ecdd";
+			try {
+				localStorage.setItem("gather-graze-theme", isDark ? "dark" : "light");
+			} catch {
+			}
+		}
+
+		let savedTheme = "light";
+		try {
+			savedTheme = localStorage.getItem("gather-graze-theme") === "dark" ? "dark" : "light";
+		} catch {
+			savedTheme = "light";
+		}
+		applyTheme(savedTheme);
+		themeToggle.addEventListener("click", () => {
+			applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+		});
+
+		let meals = [];
+		let activeCategory = "all";
+		let showingSaved = false;
+		let visibleLimit = 12;
+		let requestVersion = 0;
+		let favorites = new Set();
+
+		try {
+			favorites = new Set(JSON.parse(localStorage.getItem("gather-graze-favorites") || "[]"));
+		} catch {
+			favorites = new Set();
+		}
+
+		function escapeHTML(value = "") {
+			return String(value).replace(/[&<>"']/g, character => ({
+				"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+			})[character]);
+		}
+
+		function showStatus(title, message, loading = false) {
+			grid.innerHTML = `<div class="status-message">${loading ? '<span class="loading-dot"></span>' : ""}<strong>${escapeHTML(title)}</strong><p>${escapeHTML(message)}</p></div>`;
+			loadMoreButton.hidden = true;
+		}
+
+		async function fetchMeals(url) {
+			const response = await fetch(url);
+			if (!response.ok) throw new Error("The recipe service could not be reached.");
+			const data = await response.json();
+			return data.meals || [];
+		}
+
+		async function loadInspiration() {
+			showStatus("Setting the table…", "Finding a few lovely things to cook.", true);
+			try {
+				const initial = await fetchMeals(`${API}/search.php?s=`);
+				if (initial.length) {
+					meals = initial;
+				} else {
+					const randomMeals = await Promise.all(Array.from({ length: 12 }, () => fetchMeals(`${API}/random.php`)));
+					meals = randomMeals.flat().filter((meal, index, list) => list.findIndex(item => item.idMeal === meal.idMeal) === index);
+				}
+				document.querySelector("#collection-title").textContent = "A few good things";
+				updateFilterOptions();
+				renderMeals();
+			} catch (error) {
+				showStatus("A small kitchen pause", "We couldn't reach the recipe collection. Check your connection and try a search.");
+			}
+		}
+
+		function updateFilterOptions() {
+			const categories = [...new Set(meals.map(meal => meal.strCategory).filter(Boolean))].sort();
+			const areas = [...new Set(meals.map(meal => meal.strArea).filter(Boolean))].sort();
+			categoryFilters.innerHTML = '<span class="filter-label">Browse:</span><button class="filter-chip active" type="button" data-category="all">Everything</button>' +
+				categories.map(category => `<button class="filter-chip" type="button" data-category="${escapeHTML(category)}">${escapeHTML(category)}</button>`).join("");
+			areaFilter.innerHTML = '<option value="all">All cuisines</option>' + areas.map(area => `<option value="${escapeHTML(area)}">${escapeHTML(area)}</option>`).join("");
+		}
+
+		function getFilteredMeals() {
+			const ingredient = ingredientFilter.value.trim().toLowerCase();
+			let filtered = meals.filter(meal => {
+				const ingredients = Array.from({ length: 20 }, (_, index) => meal[`strIngredient${index + 1}`] || "").join(" ").toLowerCase();
+				return (activeCategory === "all" || meal.strCategory === activeCategory) &&
+					(areaFilter.value === "all" || meal.strArea === areaFilter.value) &&
+					(!ingredient || ingredients.includes(ingredient)) &&
+					(!showingSaved || favorites.has(meal.idMeal));
+			});
+			if (sortFilter.value === "az") filtered.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
+			if (sortFilter.value === "za") filtered.sort((a, b) => b.strMeal.localeCompare(a.strMeal));
+			return filtered;
+		}
+
+		function renderMeals() {
+			const filtered = getFilteredMeals();
+			document.querySelector("#result-count").textContent = `${filtered.length} ${filtered.length === 1 ? "recipe" : "recipes"}`;
+			document.querySelector("#saved-count").textContent = favorites.size;
+			savedToggle.setAttribute("aria-pressed", String(showingSaved));
+			loadMoreButton.hidden = filtered.length <= visibleLimit;
+			if (!filtered.length) {
+				showStatus(showingSaved ? "Nothing saved just yet" : "No recipes found", showingSaved ? "Tap the heart on a recipe to keep it close." : "Try another ingredient or loosen a filter.");
+				return;
+			}
+			grid.innerHTML = filtered.slice(0, visibleLimit).map((meal, index) => {
+				const isFavorite = favorites.has(meal.idMeal);
+				const videoLink = getYouTubeLink(meal);
+				const embedLink = videoLink ? getYouTubeEmbedLink(videoLink) : "";
+				const image = `<img class="recipe-image" src="${escapeHTML(meal.strMealThumb)}" alt="${escapeHTML(meal.strMeal)}" loading="lazy">`;
+				const imageContent = videoLink
+					? `<a class="recipe-image-link" href="${escapeHTML(videoLink)}" target="_blank" rel="noopener noreferrer" aria-label="Watch ${escapeHTML(meal.strMeal)} on YouTube">${image}</a>`
+					: image;
+				const videoPreview = embedLink
+					? `<iframe class="video-preview" data-embed-url="${escapeHTML(embedLink)}" title="${escapeHTML(meal.strMeal)} video preview" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" tabindex="-1"></iframe>`
+					: "";
+				const titleContent = videoLink
+					? `<a href="${escapeHTML(videoLink)}" target="_blank" rel="noopener noreferrer">${escapeHTML(meal.strMeal)}</a>`
+					: `<button type="button" data-recipe="${escapeHTML(meal.idMeal)}">${escapeHTML(meal.strMeal)}</button>`;
+				return `<article class="recipe-card" style="animation-delay:${Math.min(index, 8) * 35}ms">
+					<div class="recipe-image-wrap">
+						${imageContent}
+						${videoPreview}
+						<span class="card-category">${escapeHTML(meal.strCategory || "Recipe")}</span>
+						<button class="favorite-button${isFavorite ? " is-favorite" : ""}" type="button" data-favorite="${escapeHTML(meal.idMeal)}" aria-label="${isFavorite ? "Remove from" : "Save to"} favorites" aria-pressed="${isFavorite}">
+							<svg viewBox="0 0 24 24" fill="${isFavorite ? "currentColor" : "none"}" aria-hidden="true"><path d="M20.4 8.8c0 4.4-8.4 10-8.4 10s-8.4-5.6-8.4-10a4.6 4.6 0 0 1 8.4-2.6 4.6 4.6 0 0 1 8.4 2.6Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+						</button>
+					</div>
+					<div class="recipe-info">
+						<div class="recipe-meta"><span>${escapeHTML(meal.strArea || "From the collection")}</span><span>${ingredientCount(meal)} ingredients</span></div>
+						<h3 class="recipe-title">${titleContent}</h3>
+						<p class="recipe-origin">A good one for the table.</p>
+					</div>
+				</article>`;
+			}).join("");
+		}
+
+		function ingredientCount(meal) {
+			return Array.from({ length: 20 }, (_, index) => meal[`strIngredient${index + 1}`]).filter(value => value && value.trim()).length;
+		}
+
+		function getYouTubeLink(meal) {
+			try {
+				const url = new URL(meal.strYoutube);
+				const isYouTube = url.hostname === "youtube.com" || url.hostname === "youtu.be" || url.hostname.endsWith(".youtube.com");
+				return url.protocol === "https:" && isYouTube ? url.href : "";
+			} catch {
+				return "";
+			}
+		}
+
+		function getYouTubeEmbedLink(videoLink) {
+			try {
+				const url = new URL(videoLink);
+				const videoId = url.hostname === "youtu.be"
+					? url.pathname.slice(1).split("/")[0]
+					: url.searchParams.get("v") || url.pathname.match(/^\/(?:embed|shorts)\/([^/]+)/)?.[1];
+				if (!videoId) return "";
+				const params = new URLSearchParams({
+					autoplay: "1", mute: "1", controls: "0", loop: "1", playlist: videoId,
+					playsinline: "1", rel: "0"
+				});
+				return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?${params}`;
+			} catch {
+				return "";
+			}
+		}
+
+		async function searchRecipes(query) {
+			const version = ++requestVersion;
+			activeCategory = "all";
+			areaFilter.value = "all";
+			ingredientFilter.value = "";
+			showingSaved = false;
+			visibleLimit = 12;
+			document.querySelector("#collection-title").textContent = query ? `Results for “${query}”` : "A few good things";
+			showStatus("Looking through the recipe journal…", "One moment while we find your match.", true);
+			try {
+				let results = await fetchMeals(`${API}/search.php?s=${encodeURIComponent(query)}`);
+				if (!query && !results.length) {
+					const randomMeals = await Promise.all(Array.from({ length: 12 }, () => fetchMeals(`${API}/random.php`)));
+					results = randomMeals.flat().filter((meal, index, list) => list.findIndex(item => item.idMeal === meal.idMeal) === index);
+				}
+				if (version !== requestVersion) return;
+				meals = results;
+				updateFilterOptions();
+				renderMeals();
+			} catch {
+				if (version === requestVersion) showStatus("Couldn't find the recipe journal", "Please check your connection and give it another try.");
+			}
+		}
+
+		function openRecipe(meal) {
+			const ingredients = Array.from({ length: 20 }, (_, index) => ({
+				name: meal[`strIngredient${index + 1}`], measure: meal[`strMeasure${index + 1}`]
+			})).filter(item => item.name && item.name.trim());
+			document.querySelector("#modal-image").src = meal.strMealThumb;
+			document.querySelector("#modal-image").alt = meal.strMeal;
+			document.querySelector("#modal-category").textContent = `${meal.strCategory || "Recipe"}  ·  ${meal.strArea || "Gather & Graze"}`;
+			document.querySelector("#modal-title").textContent = meal.strMeal;
+			document.querySelector("#modal-subtitle").textContent = "A little something to make and share.";
+			document.querySelector("#modal-ingredients").innerHTML = ingredients.map(item => `<li><span>${escapeHTML(item.name)}</span><span>${escapeHTML((item.measure || "").trim())}</span></li>`).join("");
+			document.querySelector("#modal-instructions").textContent = meal.strInstructions || "Instructions are not available for this recipe.";
+			modal.hidden = false;
+			document.body.style.overflow = "hidden";
+			document.querySelector("#modal-close").focus();
+		}
+
+		function closeRecipe() {
+			modal.hidden = true;
+			document.body.style.overflow = "";
+		}
+
+		document.querySelector("#search-form").addEventListener("submit", event => {
+			event.preventDefault();
+			searchRecipes(searchInput.value.trim());
+		});
+		categoryFilters.addEventListener("click", event => {
+			const button = event.target.closest("[data-category]");
+			if (!button) return;
+			activeCategory = button.dataset.category;
+			categoryFilters.querySelectorAll(".filter-chip").forEach(chip => chip.classList.toggle("active", chip === button));
+			visibleLimit = 12;
+			renderMeals();
+		});
+		areaFilter.addEventListener("change", () => { visibleLimit = 12; renderMeals(); });
+		ingredientFilter.addEventListener("input", () => { visibleLimit = 12; renderMeals(); });
+		sortFilter.addEventListener("change", renderMeals);
+		savedToggle.addEventListener("click", () => { showingSaved = !showingSaved; renderMeals(); });
+		loadMoreButton.addEventListener("click", () => { visibleLimit += 12; renderMeals(); });
+		function setVideoPreview(imageLink, isActive) {
+			const wrapper = imageLink.closest(".recipe-image-wrap");
+			const preview = wrapper?.querySelector(".video-preview");
+			if (!preview) return;
+			if (isActive) {
+				wrapper.classList.add("is-previewing");
+				if (!preview.src) preview.src = preview.dataset.embedUrl;
+			} else {
+				wrapper.classList.remove("is-previewing");
+				preview.removeAttribute("src");
+			}
+		}
+		grid.addEventListener("pointerover", event => {
+			const imageLink = event.target.closest(".recipe-image-link");
+			if (imageLink && !imageLink.contains(event.relatedTarget)) setVideoPreview(imageLink, true);
+		});
+		grid.addEventListener("pointerout", event => {
+			const imageLink = event.target.closest(".recipe-image-link");
+			if (imageLink && !imageLink.contains(event.relatedTarget)) setVideoPreview(imageLink, false);
+		});
+		grid.addEventListener("focusin", event => {
+			const imageLink = event.target.closest(".recipe-image-link");
+			if (imageLink) setVideoPreview(imageLink, true);
+		});
+		grid.addEventListener("focusout", event => {
+			const imageLink = event.target.closest(".recipe-image-link");
+			if (imageLink && !imageLink.contains(event.relatedTarget)) setVideoPreview(imageLink, false);
+		});
+		grid.addEventListener("click", event => {
+			const favoriteButton = event.target.closest("[data-favorite]");
+			if (favoriteButton) {
+				const id = favoriteButton.dataset.favorite;
+				favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+				localStorage.setItem("gather-graze-favorites", JSON.stringify([...favorites]));
+				renderMeals();
+				return;
+			}
+			const recipeButton = event.target.closest("[data-recipe]");
+			if (recipeButton) {
+				const meal = meals.find(item => item.idMeal === recipeButton.dataset.recipe);
+				if (meal) openRecipe(meal);
+			}
+		});
+		document.querySelector("#modal-close").addEventListener("click", closeRecipe);
+		modal.addEventListener("click", event => { if (event.target === modal) closeRecipe(); });
+		document.addEventListener("keydown", event => { if (event.key === "Escape" && !modal.hidden) closeRecipe(); });
+
+		loadInspiration();
+	</script>
+</body>
+</html>
